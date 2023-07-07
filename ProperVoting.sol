@@ -56,22 +56,32 @@ contract Mapping{
         emit Registered(_member);
     }
 
-    function getRegistrationList() public view returns(Member[] memory){
-        return memberList;
+// Only address return not voteCount
+    // function getRegistrationList() public view returns(Member[] memory){
+    //     return memberList;
+    // }
+
+    function getRegistrationList() public view returns(address[] memory _memberList){
+        address[] memory memberAddress = new address[](memberList.length);
+        for(uint i = 0; i<memberList.length; i++){
+            memberAddress[i] = memberList[i].addr;    
+        }
+        return memberAddress;
     }
+    
 
     
     function Winner() public view returns(address, uint256) {
-        uint256 val;
-        address val1;
+        uint256 _voteCount;
+        address memberAddress;
         require(isVoting == false, "Election not ended yet");
         for(uint i=0; i < memberList.length; i++){
-            if(val < memberList[i].voteCount){
-                val = memberList[i].voteCount;
-                val1 = memberList[i].addr;
+            if(_voteCount < memberList[i].voteCount){
+                _voteCount = memberList[i].voteCount;
+                memberAddress = memberList[i].addr;
             }
         }
-        return (val1, val);
+        return (memberAddress, _voteCount);
     }
 
     function deRegister(address _deReg) public {
