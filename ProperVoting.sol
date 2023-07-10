@@ -1,27 +1,23 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+import "./OwnerShip.sol";
+
 struct Member{
     address addr;
     uint256 voteCount;
 }
 
-contract Mapping{
+contract EVoting is Ownable{
 
    
     Member[] public memberList;
-    address public owner;
     bool public isVoting;
     mapping(address=>bool) public hasVoted;
     mapping(address=>bool) public hasRegistered;
     event VoteCasted(address voter,string s);
     event Registered(address member);
 
-    constructor(){
-        owner = msg.sender;
-    } 
-
-    
     function castVoteForMember(address _member) public {
 
         require(isVoting, "Voting has not started");
@@ -43,13 +39,13 @@ contract Mapping{
         
     }
 
-    function setVotingTo(bool _isVoting) public {
-        require(msg.sender == owner, "Unauthorised");
+    function setVotingTo(bool _isVoting) public onlyOwner{
+        // require(msg.sender == owner, "Unauthorised");
         isVoting = _isVoting;
     }
 
-    function register(address _member) public{
-        require(msg.sender == owner, "Unauthorised");
+    function register(address _member) public onlyOwner{
+        // require(msg.sender == owner, "Unauthorised");
         require(!hasRegistered[_member],"Already registered");
         hasRegistered[_member] = true;
         memberList.push(Member(_member,0));
@@ -61,7 +57,7 @@ contract Mapping{
     //     return memberList;
     // }
 
-    function getRegistrationList() public view returns(address[] memory _memberList){
+    function getRegistrationList() public view returns(address[] memory){
         address[] memory memberAddress = new address[](memberList.length);
         for(uint i = 0; i<memberList.length; i++){
             memberAddress[i] = memberList[i].addr;    
@@ -84,8 +80,8 @@ contract Mapping{
         return (memberAddress, _voteCount);
     }
 
-    function deRegister(address _deReg) public {
-        require(msg.sender == owner, "Unauthorised");
+    function deRegister(address _deReg) public onlyOwner{
+        // require(msg.sender == owner, "Unauthorised");
         for(uint256 i=0; i<memberList.length; i++){
             if(memberList[i].addr == _deReg){
             delete memberList[i];
